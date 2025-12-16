@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export function HexBackground() {
-  const canvasRef = useRef(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -10,8 +10,15 @@ export function HexBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     
-    let animationId;
-    let hexagons = [];
+    let animationId: number;
+    let hexagons: Array<{
+      x: number;
+      y: number;
+      size: number;
+      opacity: number;
+      speed: number;
+      phase: number;
+    }> = [];
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -39,7 +46,7 @@ export function HexBackground() {
       }
     };
 
-    const drawHex = (x, y, size, opacity) => {
+    const drawHex = (x: number, y: number, size: number, opacity: number) => {
       ctx.beginPath();
       for (let i = 0; i < 6; i++) {
         const angle = (Math.PI / 3) * i - Math.PI / 6;

@@ -2,7 +2,7 @@ import { motion, animate } from "framer-motion";
 import { useEffect, useState } from "react";
 import { FadeInUp } from "./AnimatedSection";
 
-function AnimatedCounter({ value, suffix = "" }) {
+function AnimatedCounter({ value, suffix = "" }: { value: number; suffix?: string }) {
   const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {

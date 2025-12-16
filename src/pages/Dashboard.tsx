@@ -17,7 +17,19 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const mockDocuments = [
+interface Document {
+  id: string;
+  name: string;
+  type: "pdf" | "docx";
+  status: "completed" | "processing" | "pending";
+  aiTextScore: number;
+  aiImageScore: number;
+  uploadDate: string;
+  pages: number;
+  images: number;
+}
+
+const mockDocuments: Document[] = [
   {
     id: "1",
     name: "Research_Paper_2024.pdf",
@@ -64,23 +76,23 @@ const mockDocuments = [
   },
 ];
 
-function getScoreColor(score) {
+function getScoreColor(score: number) {
   if (score >= 70) return "text-destructive";
   if (score >= 40) return "text-chart-4";
   return "text-chart-3";
 }
 
-function getScoreBadge(score) {
+function getScoreBadge(score: number) {
   if (score >= 70) return "destructive";
   if (score >= 40) return "secondary";
   return "outline";
 }
 
-function StatusBadge({ status }) {
+function StatusBadge({ status }: { status: Document["status"] }) {
   const config = {
-    completed: { icon: CheckCircle, label: "Completed", variant: "outline" },
-    processing: { icon: Clock, label: "Processing", variant: "secondary" },
-    pending: { icon: AlertTriangle, label: "Pending", variant: "destructive" },
+    completed: { icon: CheckCircle, label: "Completed", variant: "outline" as const },
+    processing: { icon: Clock, label: "Processing", variant: "secondary" as const },
+    pending: { icon: AlertTriangle, label: "Pending", variant: "destructive" as const },
   };
   
   const { icon: Icon, label, variant } = config[status];
@@ -95,7 +107,7 @@ function StatusBadge({ status }) {
 
 export default function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [documents] = useState(mockDocuments);
+  const [documents] = useState<Document[]>(mockDocuments);
 
   const filteredDocuments = documents.filter((doc) =>
     doc.name.toLowerCase().includes(searchQuery.toLowerCase())

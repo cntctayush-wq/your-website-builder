@@ -9,6 +9,20 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { Shield, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
+interface FormErrors {
+  name?: string;
+  email?: string;
+  password?: string;
+  confirmPassword?: string;
+}
+
+interface TouchedFields {
+  name?: boolean;
+  email?: boolean;
+  password?: boolean;
+  confirmPassword?: boolean;
+}
+
 export default function Register() {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -19,18 +33,18 @@ export default function Register() {
     password: "",
     confirmPassword: ""
   });
-  const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
-  const [touched, setTouched] = useState({});
+  const [touched, setTouched] = useState<TouchedFields>({});
 
   const passwordRequirements = [
-    { label: "At least 8 characters", test: (p) => p.length >= 8 },
-    { label: "Contains uppercase letter", test: (p) => /[A-Z]/.test(p) },
-    { label: "Contains lowercase letter", test: (p) => /[a-z]/.test(p) },
-    { label: "Contains a number", test: (p) => /\d/.test(p) }
+    { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
+    { label: "Contains uppercase letter", test: (p: string) => /[A-Z]/.test(p) },
+    { label: "Contains lowercase letter", test: (p: string) => /[a-z]/.test(p) },
+    { label: "Contains a number", test: (p: string) => /\d/.test(p) }
   ];
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     
     if (touched[field]) {
@@ -38,12 +52,12 @@ export default function Register() {
     }
   };
 
-  const handleBlur = (field) => {
+  const handleBlur = (field: keyof typeof formData) => {
     setTouched((prev) => ({ ...prev, [field]: true }));
     validateField(field, formData[field]);
   };
 
-  const validateField = (field, value) => {
+  const validateField = (field: keyof typeof formData, value: string) => {
     const newErrors = { ...errors };
 
     switch (field) {
@@ -98,7 +112,7 @@ export default function Register() {
   };
 
   const validateForm = () => {
-    const allFields = ["name", "email", "password", "confirmPassword"];
+    const allFields: Array<keyof typeof formData> = ["name", "email", "password", "confirmPassword"];
     let isValid = true;
     
     allFields.forEach((field) => {
@@ -111,7 +125,7 @@ export default function Register() {
     return isValid;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
       setIsLoading(true);

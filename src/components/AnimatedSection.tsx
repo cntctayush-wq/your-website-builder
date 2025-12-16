@@ -1,6 +1,13 @@
 import { motion } from "framer-motion";
+import { ReactNode } from "react";
 
-export function FadeInUp({ children, delay = 0, className = "" }) {
+interface AnimatedProps {
+  children: ReactNode;
+  delay?: number;
+  className?: string;
+}
+
+export function FadeInUp({ children, delay = 0, className = "" }: AnimatedProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -14,7 +21,7 @@ export function FadeInUp({ children, delay = 0, className = "" }) {
   );
 }
 
-export function FadeIn({ children, delay = 0, className = "" }) {
+export function FadeIn({ children, delay = 0, className = "" }: AnimatedProps) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -28,7 +35,7 @@ export function FadeIn({ children, delay = 0, className = "" }) {
   );
 }
 
-export function ScaleIn({ children, delay = 0, className = "" }) {
+export function ScaleIn({ children, delay = 0, className = "" }: AnimatedProps) {
   return (
     <motion.div
       initial={{ opacity: 0, scale: 0.9 }}
@@ -42,7 +49,7 @@ export function ScaleIn({ children, delay = 0, className = "" }) {
   );
 }
 
-export function SlideInLeft({ children, delay = 0, className = "" }) {
+export function SlideInLeft({ children, delay = 0, className = "" }: AnimatedProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: -50 }}
@@ -56,7 +63,7 @@ export function SlideInLeft({ children, delay = 0, className = "" }) {
   );
 }
 
-export function SlideInRight({ children, delay = 0, className = "" }) {
+export function SlideInRight({ children, delay = 0, className = "" }: AnimatedProps) {
   return (
     <motion.div
       initial={{ opacity: 0, x: 50 }}
@@ -70,7 +77,13 @@ export function SlideInRight({ children, delay = 0, className = "" }) {
   );
 }
 
-export function StaggerContainer({ children, className = "", staggerDelay = 0.1 }) {
+interface StaggerContainerProps {
+  children: ReactNode;
+  className?: string;
+  staggerDelay?: number;
+}
+
+export function StaggerContainer({ children, className = "", staggerDelay = 0.1 }: StaggerContainerProps) {
   return (
     <motion.div
       initial="hidden"
@@ -90,7 +103,7 @@ export function StaggerContainer({ children, className = "", staggerDelay = 0.1 
   );
 }
 
-export function StaggerItem({ children, className = "" }) {
+export function StaggerItem({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <motion.div
       variants={{
@@ -104,7 +117,13 @@ export function StaggerItem({ children, className = "" }) {
   );
 }
 
-export function FloatingElement({ children, className = "", duration = 3 }) {
+interface FloatingElementProps {
+  children: ReactNode;
+  className?: string;
+  duration?: number;
+}
+
+export function FloatingElement({ children, className = "", duration = 3 }: FloatingElementProps) {
   return (
     <motion.div
       animate={{ y: [-10, 10, -10] }}
@@ -116,7 +135,7 @@ export function FloatingElement({ children, className = "", duration = 3 }) {
   );
 }
 
-export function PulseGlow({ children, className = "" }) {
+export function PulseGlow({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
     <motion.div
       animate={{ 

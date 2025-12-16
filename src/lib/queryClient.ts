@@ -9,8 +9,8 @@ export const queryClient = new QueryClient({
   },
 });
 
-export async function apiRequest(method, url, data) {
-  const options = {
+export async function apiRequest(method: string, url: string, data?: unknown) {
+  const options: RequestInit = {
     method,
     headers: {
       "Content-Type": "application/json",

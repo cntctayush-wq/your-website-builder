@@ -8,19 +8,27 @@ import { Upload as UploadIcon, FileText, X, AlertCircle, CheckCircle } from "luc
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 
+interface UploadedFile {
+  id: string;
+  file: File;
+  progress: number;
+  status: "uploading" | "complete" | "error";
+  error?: string;
+}
+
 const ALLOWED_TYPES = [
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 ];
-const MAX_SIZE = 50 * 1024 * 1024;
+const MAX_SIZE = 50 * 1024 * 1024; // 50MB
 
 export default function Upload() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isDragging, setIsDragging] = useState(false);
-  const [files, setFiles] = useState([]);
+  const [files, setFiles] = useState<UploadedFile[]>([]);
 
-  const validateFile = (file) => {
+  const validateFile = (file: File): string | null => {
     if (!ALLOWED_TYPES.includes(file.type)) {
       return "Only PDF and DOCX files are supported";
     }
@@ -30,12 +38,12 @@ export default function Upload() {
     return null;
   };
 
-  const processFiles = useCallback((newFiles) => {
+  const processFiles = useCallback((newFiles: FileList | File[]) => {
     const fileArray = Array.from(newFiles);
     
     fileArray.forEach((file) => {
       const error = validateFile(file);
-      const uploadedFile = {
+      const uploadedFile: UploadedFile = {
         id: Math.random().toString(36).substr(2, 9),
         file,
         progress: 0,
@@ -51,7 +59,7 @@ export default function Upload() {
     });
   }, []);
 
-  const simulateUpload = (fileId) => {
+  const simulateUpload = (fileId: string) => {
     let progress = 0;
     const interval = setInterval(() => {
       progress += Math.random() * 15;
@@ -73,29 +81,29 @@ export default function Upload() {
     }, 200);
   };
 
-  const handleDragOver = (e) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
   };
 
-  const handleDrop = (e) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragging(false);
     processFiles(e.dataTransfer.files);
   };
 
-  const handleFileSelect = (e) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       processFiles(e.target.files);
     }
   };
 
-  const removeFile = (fileId) => {
+  const removeFile = (fileId: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== fileId));
   };
 
