@@ -74,11 +74,6 @@ export function LandingHero() {
                   </PulseGlow>
                 </motion.div>
               </Link>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                <Button variant="outline" size="lg" className="text-base px-8" data-testid="button-see-demo">
-                  See Demo
-                </Button>
-              </motion.div>
             </div>
           </FadeInUp>
 

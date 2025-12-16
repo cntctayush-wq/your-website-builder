@@ -152,7 +152,7 @@ export default function Login() {
                   <input type="checkbox" className="rounded border-input" data-testid="checkbox-remember" />
                   Remember me
                 </label>
-                <a href="#" className="text-sm text-primary hover:underline" data-testid="link-forgot-password">
+                <a href="/change-password" className="text-sm text-primary hover:underline" data-testid="link-forgot-password">
                   Forgot password?
                 </a>
               </div>
