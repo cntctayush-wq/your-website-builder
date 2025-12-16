@@ -1,6 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Lora&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inconsolata&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -183,6 +186,20 @@
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
     --tracking-normal: 0em;
     --spacing: 0.25rem;
+    --button-outline: rgba(0,0,0, .10);
+    --badge-outline: rgba(0,0,0, .05);
+    --opaque-button-border-intensity: -8;
+    --elevate-1: rgba(0,0,0, .03);
+    --elevate-2: rgba(0,0,0, .08);
+    --card-border: 0 0% 94%;
+    --popover-border: 0 0% 89%;
+    --sidebar-primary-border: hsl(var(--sidebar-primary));
+    --sidebar-accent-border: hsl(var(--sidebar-accent));
+    --primary-border: hsl(var(--primary));
+    --secondary-border: hsl(var(--secondary));
+    --muted-border: hsl(var(--muted));
+    --accent-border: hsl(var(--accent));
+    --destructive-border: hsl(var(--destructive));
   }
   .dark {
     --background: 0 0% 9%;
@@ -225,6 +242,20 @@
     --shadow-lg: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 4px 6px -1px hsl(0 0% 0% / 0.1);
     --shadow-xl: 0 1px 3px 0px hsl(0 0% 0% / 0.1), 0 8px 10px -1px hsl(0 0% 0% / 0.1);
     --shadow-2xl: 0 1px 3px 0px hsl(0 0% 0% / 0.25);
+    --button-outline: rgba(255,255,255, .10);
+    --badge-outline: rgba(255,255,255, .05);
+    --opaque-button-border-intensity: 9;
+    --elevate-1: rgba(255,255,255, .04);
+    --elevate-2: rgba(255,255,255, .09);
+    --card-border: 0 0% 13%;
+    --popover-border: 0 0% 18%;
+    --sidebar-primary-border: hsl(var(--sidebar-primary));
+    --sidebar-accent-border: hsl(var(--sidebar-accent));
+    --primary-border: hsl(var(--primary));
+    --secondary-border: hsl(var(--secondary));
+    --muted-border: hsl(var(--muted));
+    --accent-border: hsl(var(--accent));
+    --destructive-border: hsl(var(--destructive));
   }
 }
 
