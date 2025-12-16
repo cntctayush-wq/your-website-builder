@@ -23,7 +23,7 @@ export function LandingHeader() {
           >
             <Shield className="h-7 w-7 text-primary" />
           </motion.div>
-          <span className="font-bold text-xl">AI Detect</span>
+          <span className="font-bold text-xl">DeepFake</span>
         </Link>
         
         <nav className="hidden md:flex items-center gap-8">
@@ -66,7 +66,6 @@ export function LandingHeader() {
             <div className="flex flex-col p-4 gap-4">
               <a href="#features" className="text-sm py-2" onClick={() => setMobileMenuOpen(false)}>Features</a>
               <a href="#how-it-works" className="text-sm py-2" onClick={() => setMobileMenuOpen(false)}>How It Works</a>
-              <a href="#pricing" className="text-sm py-2" onClick={() => setMobileMenuOpen(false)}>Pricing</a>
               <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
                 <Button className="w-full">Get Started</Button>
               </Link>
