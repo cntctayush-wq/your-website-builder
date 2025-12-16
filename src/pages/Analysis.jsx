@@ -5,29 +5,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { 
   ArrowLeft, Download, FileText, Image, AlertTriangle, 
   CheckCircle, Info, ChevronDown, ChevronUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
-interface TextSection {
-  id: string;
-  content: string;
-  aiScore: number;
-  page: number;
-}
-
-interface ImageResult {
-  id: string;
-  name: string;
-  page: number;
-  aiScore: number;
-  generator: string | null;
-}
-
-const mockTextSections: TextSection[] = [
+const mockTextSections = [
   {
     id: "1",
     content: "The rapid advancement of artificial intelligence has fundamentally transformed various industries, creating unprecedented opportunities for automation and efficiency. Machine learning algorithms now power everything from recommendation systems to autonomous vehicles.",
@@ -48,13 +32,13 @@ const mockTextSections: TextSection[] = [
   },
 ];
 
-const mockImages: ImageResult[] = [
+const mockImages = [
   { id: "1", name: "figure_1.png", page: 3, aiScore: 95, generator: "DALL-E 3" },
   { id: "2", name: "chart_data.png", page: 5, aiScore: 8, generator: null },
   { id: "3", name: "illustration.jpg", page: 7, aiScore: 78, generator: "Midjourney" },
 ];
 
-function ScoreGauge({ score, label }: { score: number; label: string }) {
+function ScoreGauge({ score, label }) {
   const getColor = () => {
     if (score >= 70) return "text-destructive";
     if (score >= 40) return "text-chart-4";
@@ -105,7 +89,7 @@ function ScoreGauge({ score, label }: { score: number; label: string }) {
   );
 }
 
-function TextSectionCard({ section }: { section: TextSection }) {
+function TextSectionCard({ section }) {
   const [expanded, setExpanded] = useState(false);
   
   const getColor = () => {

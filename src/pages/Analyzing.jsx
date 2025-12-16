@@ -6,20 +6,13 @@ import { Progress } from "@/components/ui/progress";
 import { FileText, Brain, Image, CheckCircle } from "lucide-react";
 import { motion } from "framer-motion";
 
-interface AnalysisStep {
-  id: string;
-  label: string;
-  icon: typeof FileText;
-  status: "pending" | "processing" | "complete";
-}
-
 export default function Analyzing() {
   const navigate = useNavigate();
   const location = useLocation();
-  const fileNames = (location.state as { files?: string[] })?.files || ["document.pdf"];
+  const fileNames = location.state?.files || ["document.pdf"];
   
   const [progress, setProgress] = useState(0);
-  const [steps, setSteps] = useState<AnalysisStep[]>([
+  const [steps, setSteps] = useState([
     { id: "extract", label: "Extracting content", icon: FileText, status: "pending" },
     { id: "text", label: "Analyzing text patterns", icon: Brain, status: "pending" },
     { id: "images", label: "Scanning images", icon: Image, status: "pending" },
