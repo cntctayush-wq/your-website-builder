@@ -11,6 +11,7 @@ import Upload from "./pages/Upload";
 import Analyzing from "./pages/Analyzing";
 import Analysis from "./pages/Analysis";
 import NotFound from "./pages/NotFound";
+import ChangePassword from "./pages/ChangePassword";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +29,7 @@ const App = () => (
           <Route path="/upload" element={<Upload />} />
           <Route path="/analyzing" element={<Analyzing />} />
           <Route path="/analysis/:id" element={<Analysis />} />
+          <Route path="/change-password" element={<ChangePassword />}/>
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
