@@ -58,10 +58,9 @@ export function HexBackground() {
       ctx.closePath();
       
       const isDark = document.documentElement.classList.contains("dark");
-      // Verdant green colors
       ctx.strokeStyle = isDark 
-        ? `rgba(74, 222, 128, ${opacity})` 
-        : `rgba(22, 163, 74, ${opacity})`;
+        ? `rgba(99, 102, 241, ${opacity})` 
+        : `rgba(79, 70, 229, ${opacity})`;
       ctx.lineWidth = 1;
       ctx.stroke();
     };
