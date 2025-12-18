@@ -25,6 +25,7 @@ interface ImageResult {
   page: number;
   aiScore: number;
   generator: string | null;
+  preview?: string;
 }
 
 type HighlightType = "very-likely" | "likely" | "unlikely" | "rare";
@@ -57,28 +58,28 @@ function highlightText(content: string): HighlightedWord[] {
 const mockTextSections: TextSection[] = [
   {
     id: "1",
-    content: "The rapid advancement of artificial intelligence has fundamentally transformed various industries, creating unprecedented opportunities for automation and efficiency. Machine learning algorithms now power everything from recommendation systems to autonomous vehicles.",
+    content: "The rapid advancement of artificial intelligence has fundamentally transformed various industries, creating unprecedented opportunities for automation and efficiency. Machine learning algorithms now power everything from recommendation systems to autonomous vehicles. The integration of neural networks into everyday applications has revolutionized how businesses operate and how consumers interact with technology. Deep learning models have achieved remarkable success in image recognition, natural language processing, and predictive analytics. These advancements have enabled companies to automate complex tasks that previously required human expertise and judgment. The healthcare industry has seen particularly significant benefits, with AI systems now capable of diagnosing diseases from medical images with accuracy rivaling or exceeding human specialists. Financial institutions have deployed sophisticated algorithms for fraud detection, risk assessment, and algorithmic trading. The manufacturing sector has embraced robotic automation powered by computer vision and reinforcement learning, dramatically improving production efficiency and quality control. Educational technology has been transformed by adaptive learning systems that personalize instruction based on individual student performance and learning styles. The entertainment industry uses recommendation engines to curate content, while creative tools powered by generative AI are enabling new forms of artistic expression. Transportation networks are being reimagined through autonomous vehicle technology and intelligent traffic management systems. Agricultural applications include precision farming techniques that optimize crop yields while minimizing environmental impact. Energy systems benefit from predictive maintenance and smart grid optimization. Retail businesses leverage AI for inventory management, demand forecasting, and personalized marketing campaigns. The legal profession has adopted AI tools for document review and legal research, significantly reducing the time required for case preparation. Customer service has been revolutionized by conversational AI and chatbots that can handle routine inquiries around the clock. Scientific research has accelerated through AI-assisted hypothesis generation and experimental design. Climate modeling and environmental monitoring have become more sophisticated through machine learning analysis of satellite imagery and sensor data. Urban planning incorporates AI predictions for population growth, traffic patterns, and infrastructure needs. The implications of these technological changes extend far beyond individual industries, reshaping economic structures, labor markets, and social interactions in profound and lasting ways.",
     aiScore: 92,
     page: 1
   },
   {
     id: "2",
-    content: "However, the integration of these technologies raises important ethical considerations that society must address. Privacy concerns, algorithmic bias, and the displacement of human workers are challenges that require careful policy responses.",
+    content: "However, the integration of these technologies raises important ethical considerations that society must address. Privacy concerns, algorithmic bias, and the displacement of human workers are challenges that require careful policy responses and thoughtful governance frameworks. The collection and analysis of personal data at unprecedented scales has created new vulnerabilities for individual privacy and autonomy. Companies and governments now possess the capability to monitor, predict, and influence human behavior in ways that were previously unimaginable. The potential for surveillance and social control has raised alarms among civil liberties advocates and democratic theorists. Algorithmic decision-making systems have been shown to perpetuate and amplify existing social biases, leading to discriminatory outcomes in hiring, lending, criminal justice, and other high-stakes domains. The opacity of many AI systems makes it difficult to identify and correct these biases, creating accountability gaps that undermine trust and fairness. The economic disruption caused by automation threatens to displace millions of workers, particularly those in routine cognitive and manual occupations. While new jobs will certainly emerge, the transition may be painful for those whose skills become obsolete. Educational systems must adapt to prepare workers for an economy increasingly dominated by human-AI collaboration. Governments face difficult choices about how to distribute the economic gains from automation and whether to implement policies such as universal basic income or job guarantees. The environmental impact of AI systems, particularly the energy consumption of large-scale computing infrastructure, presents another challenge that must be addressed. The concentration of AI capabilities among a small number of large technology companies raises concerns about market power and democratic accountability. International competition in AI development has created pressure to relax safety standards and ethical guidelines in pursuit of strategic advantage. The potential misuse of AI for disinformation, manipulation, and autonomous weapons systems poses existential risks that require global cooperation to address. Ensuring that AI development benefits humanity as a whole, rather than exacerbating existing inequalities, will require sustained engagement from technologists, policymakers, civil society organizations, and the general public. The choices made in the coming years will shape the trajectory of human civilization for generations to come.",
     aiScore: 88,
     page: 1
   },
   {
     id: "3",
-    content: "Based on our field research conducted over six months, we observed significant variations in user behavior across different demographic groups. The data was collected through surveys and interviews.",
+    content: "Based on our field research conducted over six months, we observed significant variations in user behavior across different demographic groups. The data was collected through surveys and interviews with participants from diverse backgrounds and geographic locations. Our methodology employed a mixed-methods approach combining quantitative analysis of usage patterns with qualitative insights from in-depth conversations with users. We recruited participants through a combination of random sampling and targeted outreach to ensure representation across age groups, income levels, educational backgrounds, and technological familiarity. The survey instrument was developed through an iterative process involving pilot testing and refinement based on participant feedback. Interview protocols were designed to elicit rich narratives about personal experiences with technology and attitudes toward AI systems. Data collection occurred across multiple sites including urban centers, suburban communities, and rural areas to capture geographic diversity. We employed trained research assistants who received standardized instruction in survey administration and interview techniques to ensure consistency across the study. Participants provided informed consent and were compensated for their time in accordance with institutional review board guidelines. The quantitative data was analyzed using statistical software with appropriate corrections for multiple comparisons. Qualitative data underwent thematic analysis by multiple coders who achieved acceptable levels of inter-rater reliability. Our findings revealed several unexpected patterns that challenged prevailing assumptions about technology adoption and usage. Older participants demonstrated higher engagement with certain AI features than younger cohorts, contrary to stereotypes about generational technology gaps. Income showed a more complex relationship with usage patterns than simple linear models would predict, with middle-income groups sometimes exhibiting distinct behaviors. Educational background influenced not just usage frequency but also the types of applications preferred and concerns expressed. Geographic location affected access to high-speed internet and shaped attitudes toward data privacy in ways that reflected local cultural and political contexts. These findings have important implications for the design and deployment of AI systems, suggesting that one-size-fits-all approaches may fail to serve diverse user populations effectively.",
     aiScore: 15,
     page: 2
   },
 ];
 
 const mockImages: ImageResult[] = [
-  { id: "1", name: "figure_1.png", page: 3, aiScore: 95, generator: "DALL-E 3" },
-  { id: "2", name: "chart_data.png", page: 5, aiScore: 8, generator: null },
-  { id: "3", name: "illustration.jpg", page: 7, aiScore: 78, generator: "Midjourney" },
+  { id: "1", name: "figure_1.png", page: 3, aiScore: 95, generator: "DALL-E 3", preview: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=200&h=200&fit=crop" },
+  { id: "2", name: "chart_data.png", page: 5, aiScore: 8, generator: null, preview: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=200&h=200&fit=crop" },
+  { id: "3", name: "illustration.jpg", page: 7, aiScore: 78, generator: "Midjourney", preview: "https://images.unsplash.com/photo-1686191128892-3b37add26d79?w=200&h=200&fit=crop" },
 ];
 
 function ScoreGauge({ score, label }: { score: number; label: string }) {
@@ -132,57 +133,28 @@ function ScoreGauge({ score, label }: { score: number; label: string }) {
   );
 }
 
-function TextSectionCard({ section }: { section: TextSection }) {
+function TextSectionCard({ section, index }: { section: TextSection; index: number }) {
   const [expanded, setExpanded] = useState(false);
   const [highlightedWords] = useState(() => highlightText(section.content));
-  
-  const getColor = () => {
-    if (section.aiScore >= 70) return "border-destructive/30 bg-destructive/5";
-    if (section.aiScore >= 40) return "border-chart-4/30 bg-chart-4/5";
-    return "border-chart-3/30 bg-chart-3/5";
-  };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`p-4 rounded-lg border ${getColor()}`}
+      className="p-4 rounded-lg border bg-card"
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-3">
-            <Badge variant="outline">Page {section.page}</Badge>
-            <Badge variant={section.aiScore >= 70 ? "destructive" : section.aiScore >= 40 ? "secondary" : "outline"}>
-              {section.aiScore}% AI
-            </Badge>
-          </div>
-          <div className={`p-3 rounded-md bg-card border text-sm leading-relaxed ${expanded ? "" : "line-clamp-3"}`}>
-            {highlightedWords.map((word, index) => (
+          <p className="font-medium mb-3">Chunk {index + 1}</p>
+          <div className={`p-3 rounded-md bg-muted/50 border text-sm leading-relaxed ${expanded ? "" : "line-clamp-4"}`}>
+            {highlightedWords.map((word, idx) => (
               <span
-                key={index}
+                key={idx}
                 className={`px-0.5 rounded ${highlightColors[word.highlight].bg} ${highlightColors[word.highlight].text}`}
               >
                 {word.text}{" "}
               </span>
             ))}
-          </div>
-          <div className="flex items-center gap-4 mt-3 text-xs">
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-green-500/30"></span>
-              Very Likely
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-yellow-500/30"></span>
-              Likely
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-red-500/30"></span>
-              Unlikely
-            </span>
-            <span className="flex items-center gap-1">
-              <span className="w-3 h-3 rounded bg-purple-500/30"></span>
-              Rare
-            </span>
           </div>
         </div>
         <Button
@@ -317,12 +289,32 @@ export default function Analysis() {
           <TabsContent value="text">
             <Card>
               <CardHeader>
-                <CardTitle>Text Sections Analysis</CardTitle>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                  <CardTitle>Text Sections Analysis</CardTitle>
+                  <div className="flex items-center gap-4 text-xs">
+                    <span className="flex items-center gap-1">
+                      <span className="w-3 h-3 rounded bg-green-500/30"></span>
+                      Very Likely
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-3 h-3 rounded bg-yellow-500/30"></span>
+                      Likely
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-3 h-3 rounded bg-red-500/30"></span>
+                      Unlikely
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <span className="w-3 h-3 rounded bg-purple-500/30"></span>
+                      Rare
+                    </span>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent className="space-y-4">
                 <AnimatePresence>
-                  {mockTextSections.map((section) => (
-                    <TextSectionCard key={section.id} section={section} />
+                  {mockTextSections.map((section, index) => (
+                    <TextSectionCard key={section.id} section={section} index={index} />
                   ))}
                 </AnimatePresence>
               </CardContent>
@@ -344,8 +336,12 @@ export default function Analysis() {
                       transition={{ delay: i * 0.1 }}
                       className="flex items-center gap-4 p-4 rounded-lg border"
                     >
-                      <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center">
-                        <Image className="h-6 w-6 text-muted-foreground" />
+                      <div className="w-20 h-20 rounded-lg overflow-hidden bg-muted">
+                        <img 
+                          src={image.preview} 
+                          alt={image.name}
+                          className="w-full h-full object-cover"
+                        />
                       </div>
                       <div className="flex-1">
                         <p className="font-medium">{image.name}</p>
