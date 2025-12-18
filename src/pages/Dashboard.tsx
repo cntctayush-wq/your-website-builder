@@ -115,9 +115,8 @@ export default function Dashboard() {
 
   const stats = {
     total: documents.length,
-    completed: documents.filter((d) => d.status === "completed").length,
-    processing: documents.filter((d) => d.status === "processing").length,
-    highRisk: documents.filter((d) => d.aiTextScore >= 70 || d.aiImageScore >= 70).length,
+    realDocuments: documents.filter((d) => d.status === "completed" && d.aiTextScore < 50 && d.aiImageScore < 50).length,
+    aiGenerated: documents.filter((d) => d.status === "completed" && (d.aiTextScore >= 50 || d.aiImageScore >= 50)).length,
   };
 
   return (
@@ -138,12 +137,11 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="grid gap-4 md:grid-cols-4 mb-8">
+        <div className="grid gap-4 md:grid-cols-3 mb-8">
           {[
-            { label: "Total Documents", value: stats.total, icon: FileText },
-            { label: "Completed", value: stats.completed, icon: CheckCircle },
-            { label: "Processing", value: stats.processing, icon: Clock },
-            { label: "High Risk", value: stats.highRisk, icon: AlertTriangle },
+            { label: "Total Documents", value: stats.total, icon: FileText, color: "text-primary" },
+            { label: "Real Documents", value: stats.realDocuments, icon: CheckCircle, color: "text-chart-3" },
+            { label: "AI Generated Documents", value: stats.aiGenerated, icon: AlertTriangle, color: "text-destructive" },
           ].map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -156,9 +154,9 @@ export default function Dashboard() {
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-sm text-muted-foreground">{stat.label}</p>
-                      <p className="text-2xl font-bold">{stat.value}</p>
+                      <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
                     </div>
-                    <stat.icon className="h-8 w-8 text-muted-foreground/50" />
+                    <stat.icon className={`h-8 w-8 ${stat.color} opacity-50`} />
                   </div>
                 </CardContent>
               </Card>

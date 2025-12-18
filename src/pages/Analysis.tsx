@@ -27,6 +27,33 @@ interface ImageResult {
   generator: string | null;
 }
 
+type HighlightType = "very-likely" | "likely" | "unlikely" | "rare";
+
+interface HighlightedWord {
+  text: string;
+  highlight: HighlightType;
+}
+
+const highlightColors: Record<HighlightType, { bg: string; text: string }> = {
+  "very-likely": { bg: "bg-green-500/20 dark:bg-green-500/30", text: "text-green-700 dark:text-green-400" },
+  "likely": { bg: "bg-yellow-500/20 dark:bg-yellow-500/30", text: "text-yellow-700 dark:text-yellow-400" },
+  "unlikely": { bg: "bg-red-500/20 dark:bg-red-500/30", text: "text-red-700 dark:text-red-400" },
+  "rare": { bg: "bg-purple-500/20 dark:bg-purple-500/30", text: "text-purple-700 dark:text-purple-400" },
+};
+
+function getRandomHighlight(): HighlightType {
+  const types: HighlightType[] = ["very-likely", "likely", "unlikely", "rare"];
+  return types[Math.floor(Math.random() * types.length)];
+}
+
+function highlightText(content: string): HighlightedWord[] {
+  const words = content.split(" ");
+  return words.map((word) => ({
+    text: word,
+    highlight: getRandomHighlight(),
+  }));
+}
+
 const mockTextSections: TextSection[] = [
   {
     id: "1",
@@ -107,6 +134,7 @@ function ScoreGauge({ score, label }: { score: number; label: string }) {
 
 function TextSectionCard({ section }: { section: TextSection }) {
   const [expanded, setExpanded] = useState(false);
+  const [highlightedWords] = useState(() => highlightText(section.content));
   
   const getColor = () => {
     if (section.aiScore >= 70) return "border-destructive/30 bg-destructive/5";
@@ -122,15 +150,40 @@ function TextSectionCard({ section }: { section: TextSection }) {
     >
       <div className="flex items-start justify-between gap-4">
         <div className="flex-1">
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-3">
             <Badge variant="outline">Page {section.page}</Badge>
             <Badge variant={section.aiScore >= 70 ? "destructive" : section.aiScore >= 40 ? "secondary" : "outline"}>
               {section.aiScore}% AI
             </Badge>
           </div>
-          <p className={`text-sm ${expanded ? "" : "line-clamp-2"}`}>
-            {section.content}
-          </p>
+          <div className={`p-3 rounded-md bg-card border text-sm leading-relaxed ${expanded ? "" : "line-clamp-3"}`}>
+            {highlightedWords.map((word, index) => (
+              <span
+                key={index}
+                className={`px-0.5 rounded ${highlightColors[word.highlight].bg} ${highlightColors[word.highlight].text}`}
+              >
+                {word.text}{" "}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mt-3 text-xs">
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-green-500/30"></span>
+              Very Likely
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-yellow-500/30"></span>
+              Likely
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-red-500/30"></span>
+              Unlikely
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-purple-500/30"></span>
+              Rare
+            </span>
+          </div>
         </div>
         <Button
           variant="ghost"
