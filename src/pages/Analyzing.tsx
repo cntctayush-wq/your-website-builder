@@ -173,7 +173,7 @@ export default function Analyzing() {
     })), []);
 
   useEffect(() => {
-    const totalDuration = 8000;
+    const totalDuration = 20000;
     const stepDuration = totalDuration / steps.length;
     
     const progressInterval = setInterval(() => {
