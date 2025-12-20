@@ -4,10 +4,9 @@ import { Navbar } from "@/components/Navbar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { 
-  FileText, Brain, Image, CheckCircle, Scan, Binary, 
-  Fingerprint, Eye, Zap, Database, Cpu, Network, 
-  Shield, Lock, Search, Sparkles, Activity, Atom,
-  CircuitBoard, Layers, FileSearch, ScanLine, Radar
+  FileText, Brain, Image, CheckCircle, Scan, 
+  Fingerprint, Eye, Network, Shield, Sparkles, 
+  Activity, FileSearch, ScanLine, Radar, Cpu, Binary
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -19,110 +18,31 @@ interface AnalysisStep {
   status: "pending" | "processing" | "complete";
 }
 
-interface FloatingIcon {
-  id: number;
-  Icon: typeof FileText;
-  x: number;
-  y: number;
-  delay: number;
-  duration: number;
-  size: number;
-}
-
-const FloatingParticle = ({ icon: Icon, x, y, delay, duration, size }: { 
-  icon: typeof FileText; 
-  x: number; 
-  y: number; 
-  delay: number;
-  duration: number;
-  size: number;
-}) => (
-  <motion.div
-    className="absolute text-primary/20"
-    initial={{ x: `${x}%`, y: `${y}%`, opacity: 0, scale: 0 }}
-    animate={{ 
-      x: [`${x}%`, `${x + (Math.random() - 0.5) * 30}%`, `${x}%`],
-      y: [`${y}%`, `${y + (Math.random() - 0.5) * 30}%`, `${y}%`],
-      opacity: [0, 0.6, 0],
-      scale: [0, 1, 0],
-      rotate: [0, 360]
-    }}
-    transition={{ 
-      duration, 
-      delay, 
-      repeat: Infinity, 
-      ease: "easeInOut" 
-    }}
-  >
-    <Icon size={size} />
-  </motion.div>
-);
-
-const DataStream = ({ index }: { index: number }) => (
-  <motion.div
-    className="absolute h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent"
-    style={{ 
-      top: `${20 + index * 15}%`,
-      width: '100%',
-    }}
-    initial={{ x: '-100%', opacity: 0 }}
-    animate={{ x: '100%', opacity: [0, 1, 0] }}
-    transition={{ 
-      duration: 2 + index * 0.3,
-      delay: index * 0.4,
-      repeat: Infinity,
-      ease: "linear"
-    }}
-  />
-);
-
-const PulseRing = ({ delay, size }: { delay: number; size: number }) => (
-  <motion.div
-    className="absolute rounded-full border-2 border-primary/30"
-    style={{ width: size, height: size }}
-    initial={{ scale: 0.8, opacity: 0 }}
-    animate={{ scale: [0.8, 1.5, 2], opacity: [0, 0.5, 0] }}
-    transition={{ 
-      duration: 2.5,
-      delay,
-      repeat: Infinity,
-      ease: "easeOut"
-    }}
-  />
-);
-
-const NeuralNode = ({ x, y, delay }: { x: number; y: number; delay: number }) => (
-  <motion.div
-    className="absolute w-2 h-2 rounded-full bg-primary"
-    style={{ left: `${x}%`, top: `${y}%` }}
-    initial={{ scale: 0, opacity: 0 }}
-    animate={{ 
-      scale: [0, 1, 0.5, 1],
-      opacity: [0, 1, 0.5, 1],
-      boxShadow: [
-        '0 0 0 0 hsl(var(--primary) / 0)',
-        '0 0 20px 5px hsl(var(--primary) / 0.5)',
-        '0 0 10px 2px hsl(var(--primary) / 0.3)',
-        '0 0 20px 5px hsl(var(--primary) / 0.5)',
-      ]
-    }}
-    transition={{ 
-      duration: 2,
-      delay,
-      repeat: Infinity,
-      ease: "easeInOut"
-    }}
-  />
-);
-
-const ScanningBar = () => (
-  <motion.div
-    className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent"
-    initial={{ top: '0%', opacity: 0 }}
-    animate={{ top: ['0%', '100%', '0%'], opacity: [0, 1, 0] }}
-    transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-  />
-);
+// Static CSS-based animations for performance
+const pulseKeyframes = `
+  @keyframes pulse-ring {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { opacity: 0.5; }
+    100% { transform: scale(2); opacity: 0; }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
+    50% { transform: translateY(-20px) rotate(180deg); opacity: 0.4; }
+  }
+  @keyframes scan-line {
+    0% { top: 0%; opacity: 0; }
+    50% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
+  }
+  @keyframes orbit {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+  @keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+`;
 
 export default function Analyzing() {
   const navigate = useNavigate();
@@ -131,17 +51,15 @@ export default function Analyzing() {
   
   const [progress, setProgress] = useState(0);
   const [currentPhase, setCurrentPhase] = useState(0);
-  const [activeMetric, setActiveMetric] = useState(0);
   
-  const phases = ["Initializing", "Extracting", "Analyzing", "Deep Scanning", "Verifying", "Finalizing"];
-  const metrics = [
-    { label: "Patterns Detected", value: 0 },
-    { label: "Confidence Score", value: 0 },
-    { label: "Data Points", value: 0 },
-    { label: "Anomalies Found", value: 0 },
-  ];
+  const phases = useMemo(() => ["Initializing", "Extracting", "Analyzing", "Deep Scanning", "Verifying", "Finalizing"], []);
   
-  const [liveMetrics, setLiveMetrics] = useState(metrics);
+  const [liveMetrics, setLiveMetrics] = useState([
+    { label: "Patterns Detected", value: 0, max: 847 },
+    { label: "Confidence Score", value: 0, max: 98 },
+    { label: "Data Points", value: 0, max: 12453 },
+    { label: "Anomalies Found", value: 0, max: 23 },
+  ]);
   
   const [steps, setSteps] = useState<AnalysisStep[]>([
     { id: "extract", label: "Content Extraction", sublabel: "Parsing document structure", icon: FileSearch, status: "pending" },
@@ -152,53 +70,35 @@ export default function Analyzing() {
     { id: "verify", label: "Authenticity Verification", sublabel: "Cross-reference validation", icon: Shield, status: "pending" },
   ]);
 
-  const floatingIcons: FloatingIcon[] = useMemo(() => [
-    Binary, Cpu, Database, Lock, Search, Sparkles, Activity, Atom, CircuitBoard, Layers, Radar, Eye, Zap
-  ].map((Icon, i) => ({
-    id: i,
-    Icon,
-    x: Math.random() * 80 + 10,
-    y: Math.random() * 80 + 10,
-    delay: i * 0.3,
-    duration: 3 + Math.random() * 2,
-    size: 16 + Math.random() * 16,
-  })), []);
-
-  const neuralNodes = useMemo(() => 
-    Array.from({ length: 12 }, (_, i) => ({
-      id: i,
-      x: 10 + (i % 4) * 25 + Math.random() * 10,
-      y: 20 + Math.floor(i / 4) * 25 + Math.random() * 10,
-      delay: i * 0.15,
-    })), []);
-
   useEffect(() => {
     const totalDuration = 20000;
     const stepDuration = totalDuration / steps.length;
     
+    // Single interval for progress - updates less frequently
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) {
           clearInterval(progressInterval);
           return 100;
         }
-        return prev + 0.5;
+        return prev + 1;
       });
-    }, totalDuration / 200);
+    }, totalDuration / 100);
 
+    // Phase updates
     const phaseInterval = setInterval(() => {
       setCurrentPhase((prev) => (prev + 1) % phases.length);
     }, totalDuration / phases.length);
 
+    // Metrics update - less frequent
     const metricInterval = setInterval(() => {
-      setActiveMetric((prev) => (prev + 1) % 4);
-      setLiveMetrics(prev => prev.map((m, i) => ({
+      setLiveMetrics(prev => prev.map((m) => ({
         ...m,
-        value: Math.min(m.value + Math.floor(Math.random() * 15) + 5, 
-          i === 0 ? 847 : i === 1 ? 98 : i === 2 ? 12453 : 23)
+        value: Math.min(m.value + Math.floor(Math.random() * (m.max / 20)) + 1, m.max)
       })));
-    }, 300);
+    }, 500);
 
+    // Step updates
     steps.forEach((_, index) => {
       setTimeout(() => {
         setSteps((prev) =>
@@ -231,33 +131,29 @@ export default function Analyzing() {
     };
   }, [navigate, steps.length, phases.length]);
 
+  const orbitingIcons = useMemo(() => [Eye, Fingerprint, Network, Binary], []);
+
   return (
     <div className="min-h-screen bg-background overflow-hidden">
+      <style>{pulseKeyframes}</style>
       <Navbar />
       
-      {/* Background Effects */}
+      {/* Simplified Background - CSS animations only */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        {/* Floating Icons */}
-        {floatingIcons.map((item) => (
-          <FloatingParticle 
-            key={item.id}
-            icon={item.Icon}
-            x={item.x}
-            y={item.y}
-            delay={item.delay}
-            duration={item.duration}
-            size={item.size}
-          />
-        ))}
-        
-        {/* Data Streams */}
-        {[0, 1, 2, 3, 4].map((i) => (
-          <DataStream key={i} index={i} />
-        ))}
-
-        {/* Neural Nodes */}
-        {neuralNodes.map((node) => (
-          <NeuralNode key={node.id} x={node.x} y={node.y} delay={node.delay} />
+        {/* Static floating icons with CSS animation */}
+        {[Cpu, Brain, Shield, Sparkles, Scan].map((Icon, i) => (
+          <div
+            key={i}
+            className="absolute text-primary/20 will-change-transform"
+            style={{
+              left: `${15 + i * 18}%`,
+              top: `${20 + (i % 3) * 25}%`,
+              animation: `float ${4 + i}s ease-in-out infinite`,
+              animationDelay: `${i * 0.5}s`,
+            }}
+          >
+            <Icon size={20 + i * 4} />
+          </div>
         ))}
       </div>
       
@@ -266,25 +162,28 @@ export default function Analyzing() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
-          {/* Central Brain Animation */}
+          {/* Central Brain Animation - Simplified */}
           <div className="relative inline-flex items-center justify-center mb-8">
-            {/* Pulse Rings */}
-            <div className="absolute inset-0 flex items-center justify-center">
-              <PulseRing delay={0} size={120} />
-              <PulseRing delay={0.5} size={160} />
-              <PulseRing delay={1} size={200} />
-            </div>
+            {/* CSS Pulse Rings */}
+            <div 
+              className="absolute w-32 h-32 rounded-full border-2 border-primary/30 will-change-transform"
+              style={{ animation: 'pulse-ring 2.5s ease-out infinite' }}
+            />
+            <div 
+              className="absolute w-40 h-40 rounded-full border-2 border-primary/20 will-change-transform"
+              style={{ animation: 'pulse-ring 2.5s ease-out infinite 0.5s' }}
+            />
             
-            {/* Rotating Outer Ring */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="absolute w-32 h-32"
+            {/* CSS Rotating Outer Ring */}
+            <div 
+              className="absolute w-32 h-32 will-change-transform"
+              style={{ animation: 'orbit 8s linear infinite' }}
             >
-              {[0, 45, 90, 135, 180, 225, 270, 315].map((deg, i) => (
-                <motion.div
+              {[0, 90, 180, 270].map((deg) => (
+                <div
                   key={deg}
                   className="absolute w-3 h-3 rounded-full bg-primary/60"
                   style={{
@@ -292,43 +191,19 @@ export default function Analyzing() {
                     top: '50%',
                     transform: `rotate(${deg}deg) translateY(-60px) translateX(-50%)`,
                   }}
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.4, 1, 0.4] }}
-                  transition={{ duration: 1.5, delay: i * 0.1, repeat: Infinity }}
                 />
               ))}
-            </motion.div>
-
-            {/* Counter-Rotating Inner Ring */}
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-              className="absolute w-24 h-24 rounded-full border-2 border-dashed border-primary/40"
-            />
-
-            {/* Scanning Bar Inside */}
-            <div className="absolute w-20 h-20 rounded-full overflow-hidden">
-              <ScanningBar />
             </div>
 
             {/* Central Icon */}
-            <motion.div
-              className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center backdrop-blur-sm border border-primary/30"
-              animate={{ 
-                boxShadow: [
-                  '0 0 20px 0 hsl(var(--primary) / 0.3)',
-                  '0 0 40px 10px hsl(var(--primary) / 0.5)',
-                  '0 0 20px 0 hsl(var(--primary) / 0.3)',
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            >
+            <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center backdrop-blur-sm border border-primary/30 shadow-[0_0_30px_5px_hsl(var(--primary)/0.3)]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentPhase}
-                  initial={{ scale: 0, rotate: -180 }}
-                  animate={{ scale: 1, rotate: 0 }}
-                  exit={{ scale: 0, rotate: 180 }}
-                  transition={{ duration: 0.5 }}
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
                 >
                   {currentPhase === 0 && <Cpu className="h-10 w-10 text-primary" />}
                   {currentPhase === 1 && <FileText className="h-10 w-10 text-primary" />}
@@ -338,16 +213,15 @@ export default function Analyzing() {
                   {currentPhase === 5 && <Sparkles className="h-10 w-10 text-primary" />}
                 </motion.div>
               </AnimatePresence>
-            </motion.div>
+            </div>
 
-            {/* Orbiting Icons */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-              className="absolute w-48 h-48"
+            {/* CSS Orbiting Icons */}
+            <div 
+              className="absolute w-48 h-48 will-change-transform"
+              style={{ animation: 'orbit 10s linear infinite' }}
             >
-              {[Eye, Fingerprint, Network, Binary].map((Icon, i) => (
-                <motion.div
+              {orbitingIcons.map((Icon, i) => (
+                <div
                   key={i}
                   className="absolute w-8 h-8 rounded-full bg-background border border-primary/30 flex items-center justify-center"
                   style={{
@@ -355,40 +229,21 @@ export default function Analyzing() {
                     top: '50%',
                     transform: `rotate(${i * 90}deg) translateY(-90px) translateX(-50%)`,
                   }}
-                  animate={{ rotate: -360 }}
-                  transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
                 >
                   <Icon className="h-4 w-4 text-primary" />
-                </motion.div>
+                </div>
               ))}
-            </motion.div>
+            </div>
           </div>
           
           {/* Phase Indicator */}
-          <motion.div
-            key={phases[currentPhase]}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="mb-2"
-          >
+          <div className="mb-2">
             <span className="text-xs font-mono text-primary/70 tracking-widest uppercase">
               Phase {currentPhase + 1}/{phases.length}
             </span>
-          </motion.div>
+          </div>
           
-          <h1 className="text-3xl font-bold mb-2">
-            <AnimatePresence mode="wait">
-              <motion.span
-                key={phases[currentPhase]}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="inline-block"
-              >
-                {phases[currentPhase]} Analysis
-              </motion.span>
-            </AnimatePresence>
-          </h1>
+          <h1 className="text-3xl font-bold mb-2">{phases[currentPhase]} Analysis</h1>
           <p className="text-muted-foreground">
             {fileNames.length > 1 
               ? `Deep scanning ${fileNames.length} files...`
@@ -398,71 +253,46 @@ export default function Analyzing() {
         </motion.div>
 
         {/* Live Metrics Grid */}
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6"
-        >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
           {liveMetrics.map((metric, i) => (
-            <motion.div
+            <div
               key={metric.label}
-              className={`p-4 rounded-lg border transition-all duration-300 ${
-                activeMetric === i 
-                  ? 'bg-primary/10 border-primary/40 shadow-lg shadow-primary/10' 
-                  : 'bg-card/50 border-border/50'
-              }`}
-              animate={activeMetric === i ? { scale: [1, 1.02, 1] } : {}}
-              transition={{ duration: 0.3 }}
+              className="p-4 rounded-lg border bg-card/50 border-border/50 transition-colors"
             >
               <div className="text-xs text-muted-foreground mb-1">{metric.label}</div>
-              <motion.div 
-                className="text-xl font-bold font-mono text-primary"
-                key={metric.value}
-                initial={{ opacity: 0.5 }}
-                animate={{ opacity: 1 }}
-              >
+              <div className="text-xl font-bold font-mono text-primary">
                 {metric.value.toLocaleString()}
                 {i === 1 && '%'}
-              </motion.div>
-            </motion.div>
+              </div>
+            </div>
           ))}
-        </motion.div>
+        </div>
 
         {/* Main Progress Card */}
         <Card className="backdrop-blur-sm bg-card/80 border-border/50 overflow-hidden relative">
-          <div className="absolute inset-0 overflow-hidden">
-            <ScanningBar />
-          </div>
+          {/* CSS Scanning Bar */}
+          <div 
+            className="absolute left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary to-transparent will-change-transform"
+            style={{ animation: 'scan-line 3s ease-in-out infinite' }}
+          />
           
           <CardContent className="p-6 relative z-10">
             {/* Progress Bar */}
             <div className="mb-6">
               <div className="flex justify-between text-sm mb-2">
                 <div className="flex items-center gap-2">
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                  >
-                    <Activity className="h-4 w-4 text-primary" />
-                  </motion.div>
+                  <Activity className="h-4 w-4 text-primary animate-spin" style={{ animationDuration: '2s' }} />
                   <span>Overall Progress</span>
                 </div>
-                <motion.span 
-                  className="font-mono font-bold text-primary"
-                  key={Math.round(progress)}
-                  initial={{ scale: 1.2 }}
-                  animate={{ scale: 1 }}
-                >
+                <span className="font-mono font-bold text-primary">
                   {Math.round(progress)}%
-                </motion.span>
+                </span>
               </div>
               <div className="relative">
                 <Progress value={progress} className="h-3" />
-                <motion.div
-                  className="absolute top-0 h-3 w-20 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                  animate={{ left: ['0%', '100%'] }}
-                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                <div
+                  className="absolute top-0 h-3 w-20 bg-gradient-to-r from-transparent via-white/30 to-transparent will-change-transform"
+                  style={{ animation: 'shimmer 1.5s linear infinite' }}
                 />
               </div>
             </div>
@@ -474,51 +304,32 @@ export default function Analyzing() {
                   key={step.id}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all duration-500 ${
+                  transition={{ delay: index * 0.1, duration: 0.3 }}
+                  className={`flex items-center gap-4 p-4 rounded-xl border transition-all duration-300 ${
                     step.status === "processing" 
-                      ? "bg-primary/5 border-primary/30 shadow-lg shadow-primary/5" 
+                      ? "bg-primary/5 border-primary/30" 
                       : step.status === "complete"
                       ? "bg-chart-3/5 border-chart-3/30"
                       : "bg-muted/20 border-border/30"
                   }`}
                 >
-                  <motion.div 
-                    className={`w-12 h-12 rounded-xl flex items-center justify-center relative ${
+                  <div 
+                    className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                       step.status === "processing" 
                         ? "bg-primary/20" 
                         : step.status === "complete"
                         ? "bg-chart-3/20"
                         : "bg-muted/50"
                     }`}
-                    animate={step.status === "processing" ? {
-                      boxShadow: [
-                        '0 0 0 0 hsl(var(--primary) / 0)',
-                        '0 0 20px 5px hsl(var(--primary) / 0.3)',
-                        '0 0 0 0 hsl(var(--primary) / 0)',
-                      ]
-                    } : {}}
-                    transition={{ duration: 1.5, repeat: Infinity }}
                   >
                     {step.status === "complete" ? (
-                      <motion.div
-                        initial={{ scale: 0, rotate: -180 }}
-                        animate={{ scale: 1, rotate: 0 }}
-                        transition={{ type: "spring", stiffness: 200 }}
-                      >
-                        <CheckCircle className="h-6 w-6 text-chart-3" />
-                      </motion.div>
+                      <CheckCircle className="h-6 w-6 text-chart-3" />
                     ) : (
-                      <motion.div
-                        animate={step.status === "processing" ? { rotate: 360 } : {}}
-                        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                      >
-                        <step.icon className={`h-6 w-6 ${
-                          step.status === "processing" ? "text-primary" : "text-muted-foreground"
-                        }`} />
-                      </motion.div>
+                      <step.icon className={`h-6 w-6 ${
+                        step.status === "processing" ? "text-primary animate-pulse" : "text-muted-foreground"
+                      }`} />
                     )}
-                  </motion.div>
+                  </div>
                   
                   <div className="flex-1 min-w-0">
                     <p className={`font-medium ${
@@ -532,45 +343,31 @@ export default function Analyzing() {
                       {step.sublabel}
                     </p>
                     {step.status === "processing" && (
-                      <motion.div 
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: "100%" }}
-                        className="mt-2 h-1 rounded-full bg-primary/20 overflow-hidden"
-                      >
-                        <motion.div
-                          className="h-full bg-primary"
-                          animate={{ width: ["0%", "100%"] }}
-                          transition={{ duration: 1.5, repeat: Infinity }}
+                      <div className="mt-2 h-1 rounded-full bg-primary/20 overflow-hidden">
+                        <div
+                          className="h-full bg-primary will-change-transform"
+                          style={{ 
+                            animation: 'shimmer 1.5s linear infinite',
+                            width: '50%'
+                          }}
                         />
-                      </motion.div>
+                      </div>
                     )}
                   </div>
 
                   {step.status === "processing" && (
                     <div className="flex items-center gap-2">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                        className="w-6 h-6 border-2 border-primary/30 border-t-primary rounded-full"
-                      />
-                      <motion.span
-                        animate={{ opacity: [0.5, 1, 0.5] }}
-                        transition={{ duration: 1.5, repeat: Infinity }}
-                        className="text-xs font-mono text-primary"
-                      >
+                      <div className="w-5 h-5 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+                      <span className="text-xs font-mono text-primary animate-pulse">
                         Processing
-                      </motion.span>
+                      </span>
                     </div>
                   )}
 
                   {step.status === "complete" && (
-                    <motion.span
-                      initial={{ opacity: 0, x: 10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className="text-xs font-mono text-chart-3"
-                    >
+                    <span className="text-xs font-mono text-chart-3">
                       Complete
-                    </motion.span>
+                    </span>
                   )}
                 </motion.div>
               ))}
@@ -579,20 +376,10 @@ export default function Analyzing() {
         </Card>
 
         {/* Bottom Info */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Radar className="h-4 w-4" />
-          </motion.div>
+        <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground">
+          <Radar className="h-4 w-4 animate-spin" style={{ animationDuration: '3s' }} />
           <span>Advanced AI analysis in progress • Estimated time: ~30 seconds</span>
-        </motion.div>
+        </div>
       </main>
     </div>
   );
