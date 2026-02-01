@@ -1,11 +1,15 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Menu, X, Shield, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "@/hooks/use-toast";
 
 export function Navbar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navLinks = [
@@ -14,6 +18,14 @@ export function Navbar() {
   ];
 
   const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    logout();
+    toast({
+      title: "Logout Successfully",
+    });
+    navigate("/");
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -42,11 +54,14 @@ export function Navbar() {
           <Button variant="ghost" size="icon" data-testid="button-account">
             <User className="h-5 w-5" />
           </Button>
-          <Link to="/">
-            <Button variant="ghost" size="icon" data-testid="button-logout">
-              <LogOut className="h-5 w-5" />
-            </Button>
-          </Link>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={handleLogout}
+            data-testid="button-logout"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
           
           <Button
             variant="ghost"
