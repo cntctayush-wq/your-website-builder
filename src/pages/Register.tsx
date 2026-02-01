@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HexBackground } from "@/components/HexBackground";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AdminDisabledPopup } from "@/components/AdminDisabledPopup";
 import { Shield, Eye, EyeOff, Mail, Lock, User, ArrowLeft, Check, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -24,7 +25,6 @@ interface TouchedFields {
 }
 
 export default function Register() {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -36,6 +36,7 @@ export default function Register() {
   const [errors, setErrors] = useState<FormErrors>({});
   const [isLoading, setIsLoading] = useState(false);
   const [touched, setTouched] = useState<TouchedFields>({});
+  const [showDisabledPopup, setShowDisabledPopup] = useState(false);
 
   const passwordRequirements = [
     { label: "At least 8 characters", test: (p: string) => p.length >= 8 },
@@ -131,8 +132,8 @@ export default function Register() {
       setIsLoading(true);
       setTimeout(() => {
         setIsLoading(false);
-        console.log("Registration submitted:", formData);
-        navigate("/login");
+        // Always show disabled popup - registration is disabled
+        setShowDisabledPopup(true);
       }, 1500);
     }
   };
@@ -140,6 +141,11 @@ export default function Register() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background relative">
       <HexBackground />
+      
+      <AdminDisabledPopup 
+        isOpen={showDisabledPopup} 
+        onClose={() => setShowDisabledPopup(false)} 
+      />
       
       <div className="absolute top-4 left-4 z-20">
         <Link to="/">
