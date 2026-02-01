@@ -6,16 +6,20 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { HexBackground } from "@/components/HexBackground";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { AdminDisabledPopup } from "@/components/AdminDisabledPopup";
+import { useAuth } from "@/contexts/AuthContext";
 import { Shield, Eye, EyeOff, Mail, Lock, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showDisabledPopup, setShowDisabledPopup] = useState(false);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -28,8 +32,8 @@ export default function Login() {
     
     if (!password) {
       newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    } else if (password.length < 4) {
+      newErrors.password = "Password must be at least 4 characters";
     }
     
     setErrors(newErrors);
@@ -42,8 +46,12 @@ export default function Login() {
       setIsLoading(true);
       setTimeout(() => {
         setIsLoading(false);
-        console.log("Login submitted:", { email, password });
-        navigate("/dashboard");
+        const success = login(email, password);
+        if (success) {
+          navigate("/dashboard");
+        } else {
+          setShowDisabledPopup(true);
+        }
       }, 1000);
     }
   };
@@ -51,6 +59,11 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background relative">
       <HexBackground />
+      
+      <AdminDisabledPopup 
+        isOpen={showDisabledPopup} 
+        onClose={() => setShowDisabledPopup(false)} 
+      />
       
       <div className="absolute top-4 left-4 z-20">
         <Link to="/">
